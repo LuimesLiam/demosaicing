@@ -1,0 +1,42 @@
+def equalize_hist_custom(image):
+    # Calculate histogram
+    hist, bins = np.histogram(image.flatten(), 256, [0,256])
+    
+    # Calculate cumulative distribution function (CDF)
+    cdf = hist.cumsum()
+    
+    # Normalize CDF
+    cdf_normalized = (cdf - cdf.min()) * 255 / (cdf.max() - cdf.min())
+    
+    # Interpolate CDF to map pixel values
+    equalized_image = np.interp(image.flatten(), bins[:-1], cdf_normalized)
+    
+    # Reshape equalized image
+    equalized_image = equalized_image.reshape(image.shape)
+    
+    return equalized_image.astype(np.uint8)
+
+
+    def clahe2(image, clip_limit=2.0, grid_size=(8, 8)):
+    # Convert the image to LAB color space
+    lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+    
+    # Split the LAB image into its components
+    l_channel, a_channel, b_channel = cv2.split(lab_image)
+    
+    # Apply histogram equalization to the L channel
+    #l_channel_equalized = equalize_hist_custom(l_channel)
+    
+    # Create a CLAHE object
+    clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=grid_size)
+    
+    # Apply CLAHE to the L channel
+    l_channel_clahe = clahe.apply(l_channel)
+    
+    # Merge the CLAHE-enhanced L channel with the original A and B channels
+    clahe_lab_image = cv2.merge((l_channel_clahe, a_channel, b_channel))
+    
+    # Convert the CLAHE-enhanced LAB image back to BGR color space
+    clahe_image = cv2.cvtColor(clahe_lab_image, cv2.COLOR_LAB2BGR)
+    
+    return clahe_image

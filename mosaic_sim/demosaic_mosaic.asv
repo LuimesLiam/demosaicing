@@ -1,0 +1,13 @@
+
+
+
+I = imread("C:/Users/liaml/Desktop/imageproc/demosaicing/images/mosaiced/truck.png");
+GT = imread("C:/Users/liaml/Desktop/imageproc/demosaicing/images/ground_truth/truck.png");
+I=I(:,:,1);
+J = demosaic(I,"rggb");
+
+
+
+mse =mean_squared_error(J,GT)
+
+imshow(J)
