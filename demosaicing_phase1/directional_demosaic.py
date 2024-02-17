@@ -27,8 +27,24 @@ def create_bayer_masks(shape, pattern):
         G_m[0::2, 1::2] = 1
         G_m[1::2, 0::2] = 1
         B_m[1::2, 1::2] = 1
+    elif pattern == "BGGR":
+        B_m[0::2, 0::2] = 1
+        G_m[0::2, 1::2] = 1
+        G_m[1::2, 0::2] = 1
+        R_m[1::2, 1::2] = 1
+    elif pattern == "GRBG":
+        G_m[0::2, 0::2] = 1
+        R_m[0::2, 1::2] = 1
+        B_m[1::2, 0::2] = 1
+        G_m[1::2, 1::2] = 1
+    elif pattern == "GBRG":
+        G_m[0::2, 0::2] = 1
+        B_m[0::2, 1::2] = 1
+        R_m[1::2, 0::2] = 1
+        G_m[1::2, 1::2] = 1
+    else:
+        raise ValueError("Unsupported Bayer pattern")
     # Add similar conditions for other patterns ("BGGR", "GRBG", "GBRG")
-
     return R_m, G_m, B_m
 
 def horizontal_convolution(image, filter_kernel):
@@ -141,10 +157,10 @@ def mean_squared_error(imageA, imageB):
 
 print("start")
 names = ['bird.png', 'truck.png','snow-dog.png']
-ind = 2
+ind = 1
 CFA = plt.imread(f'images/mosaiced/{names[ind]}')
 gt = plt.imread(f'images/ground_truth/{names[ind]}')
-eg=demosaic_CFA_Bayer(CFA)
+eg=demosaic_CFA_Bayer(CFA, 'RGGB')
 #eg= cv2.normalize(eg, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
 
 

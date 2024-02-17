@@ -13,17 +13,46 @@ import time
 save_work = False
 print_status = False
 input_str = []
-def masks_CFA_Bayer(shape: int or Tuple[int, ...], pattern: str = "RGGB") -> Tuple[np.ndarray, ...]:
+# def masks_CFA_Bayer(shape: int or Tuple[int, ...], pattern: str = "RGGB") -> Tuple[np.ndarray, ...]:
 
 
-    pattern = pattern.upper()
-    channels = {channel: np.zeros(shape, dtype="bool") for channel in "RGB"}
+#     pattern = pattern.upper()
+#     channels = {channel: np.zeros(shape, dtype="bool") for channel in "RGB"}
     
-    for channel, (y, x) in zip(pattern, [(0, 0), (0, 1), (1, 0), (1, 1)]):
-        channels[channel][y::2, x::2] = 1
+#     for channel, (y, x) in zip(pattern, [(0, 0), (0, 1), (1, 0), (1, 1)]):
+#         channels[channel][y::2, x::2] = 1
 
-    return tuple(channels.values())
+#     return tuple(channels.values())
 
+def masks_CFA_Bayer(shape: int or Tuple[int, ...], pattern: str = "RGGB") -> Tuple[np.ndarray, ...]:
+    R_m = np.zeros(shape)
+    G_m = np.zeros(shape)
+    B_m = np.zeros(shape)
+
+    if pattern == "RGGB":
+        R_m[0::2, 0::2] = 1
+        G_m[0::2, 1::2] = 1
+        G_m[1::2, 0::2] = 1
+        B_m[1::2, 1::2] = 1
+    elif pattern == "BGGR":
+        B_m[0::2, 0::2] = 1
+        G_m[0::2, 1::2] = 1
+        G_m[1::2, 0::2] = 1
+        R_m[1::2, 1::2] = 1
+    elif pattern == "GRBG":
+        G_m[0::2, 0::2] = 1
+        R_m[0::2, 1::2] = 1
+        B_m[1::2, 0::2] = 1
+        G_m[1::2, 1::2] = 1
+    elif pattern == "GBRG":
+        G_m[0::2, 0::2] = 1
+        B_m[0::2, 1::2] = 1
+        R_m[1::2, 0::2] = 1
+        G_m[1::2, 1::2] = 1
+    else:
+        raise ValueError("Unsupported Bayer pattern")
+    # Add similar conditions for other patterns ("BGGR", "GRBG", "GBRG")
+    return R_m, G_m, B_m
 
 def learn(input_images, kernels, ground_truths=None, gamma=0.05, name=None):
     global save_work
@@ -120,7 +149,7 @@ def input_thread():
 
 print("start")
 names = ['bird.png', 'truck.png','snow-dog.png']
-ind = 2
+ind = 1
 CFA = plt.imread(f'images/mosaiced/{names[ind]}')
 gt = plt.imread(f'images/ground_truth/{names[ind]}')
 

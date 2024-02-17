@@ -23,21 +23,15 @@ def compute_cdf(hist):
     return cdf / cdf[-1]
 
 def clahe_custom(image, clip_limit=2.0, grid_size=(8, 8), overlap_ratio=5):
-    # Convert the image to LAB color space
     lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-    
-    # Split the LAB image into its components
     l_channel, a_channel, b_channel = cv2.split(lab_image)
-    
-    # Calculate the size of each tile
+
     tile_height = l_channel.shape[0] // grid_size[0]
     tile_width = l_channel.shape[1] // grid_size[1]
     
-    # Calculate overlap regions
     overlap_height = int(tile_height * overlap_ratio)
     overlap_width = int(tile_width * overlap_ratio)
     
-    # Initialize the CLAHE-enhanced L channel
     l_channel_clahe = np.zeros_like(l_channel)
     
     # Iterate over each tile with overlap
@@ -48,35 +42,23 @@ def clahe_custom(image, clip_limit=2.0, grid_size=(8, 8), overlap_ratio=5):
             y_end = (i + 1) * tile_height + min(grid_size[0] - i - 1, 1) * overlap_height
             x_start = j * tile_width - min(j, 1) * overlap_width
             x_end = (j + 1) * tile_width + min(grid_size[1] - j - 1, 1) * overlap_width
-            
-            # Extract the tile from the L channel
+
             tile = l_channel[y_start:y_end, x_start:x_end]
-            
-            # Calculate histogram of the tile
+
             hist, _ = np.histogram(tile.flatten(), bins=256, range=[0, 256])
-            
-            # Clip histogram
+ 
             hist_clipped = clip_histogram(hist, clip_limit)
-            
-            # Compute cumulative distribution function (CDF)
+
             cdf = compute_cdf(hist_clipped)
-            
-            # Map pixel values using CDF
             tile_equalized = np.interp(tile.flatten(), np.arange(256), 255 * cdf).reshape(tile.shape)
-            
-            # Assign equalized tile to CLAHE-enhanced L channel
             l_channel_clahe[y_start:y_end, x_start:x_end] = tile_equalized
-    
-    # Merge the CLAHE-enhanced L channel with the original A and B channels
+
     clahe_lab_image = cv2.merge((l_channel_clahe, a_channel, b_channel))
-    # Apply a Gaussian filter to the CLAHE image to smooth it out
-
-
-    
-    # Convert the CLAHE-enhanced LAB image back to BGR color space
     clahe_image = cv2.cvtColor(clahe_lab_image, cv2.COLOR_LAB2BGR)
     
     return clahe_image
+
+
 def clahe2(image, clip_limit=2.0, grid_size=(8, 8)):
     # Convert the image to LAB color space
     lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
@@ -128,16 +110,35 @@ def gray_world_white_balance(image):
     
     return img_balanced
 
-def masks_CFA_Bayer(shape: int or Tuple[int, ...], pattern: str = "RGGB") -> Tuple[np.ndarray, ...]:
+def create_bayer_masks(shape, pattern):
+    R_m = np.zeros(shape)
+    G_m = np.zeros(shape)
+    B_m = np.zeros(shape)
 
-
-    pattern = pattern.upper()
-    channels = {channel: np.zeros(shape, dtype="bool") for channel in "RGB"}
-    
-    for channel, (y, x) in zip(pattern, [(0, 0), (0, 1), (1, 0), (1, 1)]):
-        channels[channel][y::2, x::2] = 1
-
-    return tuple(channels.values())
+    if pattern == "RGGB":
+        R_m[0::2, 0::2] = 1
+        G_m[0::2, 1::2] = 1
+        G_m[1::2, 0::2] = 1
+        B_m[1::2, 1::2] = 1
+    elif pattern == "BGGR":
+        B_m[0::2, 0::2] = 1
+        G_m[0::2, 1::2] = 1
+        G_m[1::2, 0::2] = 1
+        R_m[1::2, 1::2] = 1
+    elif pattern == "GRBG":
+        G_m[0::2, 0::2] = 1
+        R_m[0::2, 1::2] = 1
+        B_m[1::2, 0::2] = 1
+        G_m[1::2, 1::2] = 1
+    elif pattern == "GBRG":
+        G_m[0::2, 0::2] = 1
+        B_m[0::2, 1::2] = 1
+        R_m[1::2, 0::2] = 1
+        G_m[1::2, 1::2] = 1
+    else:
+        raise ValueError("Unsupported Bayer pattern")
+    # Add similar conditions for other patterns ("BGGR", "GRBG", "GBRG")
+    return R_m, G_m, B_m
 
 def mean_squared_error(imageA, imageB):
     # Ensure the images are in floating point in case they are in uint8
@@ -151,12 +152,12 @@ def mean_squared_error(imageA, imageB):
     return err
 
 
-def demosaic(names, ind, RK, GK, smoothing= False, norm=False, display=True, is_gt=False, balanced=False, he=False):
+def demosaic(names, ind, RK, GK, smoothing= False, norm=False, display=True, is_gt=False, balanced=False, he=False, pattern ='RGGB' ):
     CFA = plt.imread(f'images/mosaiced/{names[ind]}')
     if is_gt == True:
         gt = plt.imread(f'images/ground_truth/{names[ind]}')
 
-    R_m, G_m, B_m = masks_CFA_Bayer(CFA.shape, "RGGB")
+    R_m, G_m, B_m = create_bayer_masks(CFA.shape, pattern)
     R = CFA * R_m
     G = CFA * G_m 
     B = CFA * B_m
@@ -198,20 +199,14 @@ def demosaic(names, ind, RK, GK, smoothing= False, norm=False, display=True, is_
         plt.show()
         
 
+patternB = ['Bbest-rggb','dirtyred']
+patternA = ['Abest-rggb', 'dirtygreen']
+RK = np.load(f"outputs/matrix/{patternB[0]}.npy")
 
-RK = np.load("outputs/matrix/Bbest-rggb.npy")
+GK = np.load(f"outputs/matrix/{patternA[0]}.npy")
 
-GK = np.load("outputs/matrix/Abest-rggb.npy")
+print("G", GK)
+print("R", RK)
+name = ['bird.png', 'truck.png','snow-dog.png','bird-white.png']
 
-name = ['bird.png', 'truck.png','snow-dog.png']
-
-demosaic(name,2,RK,GK,smoothing=False, is_gt=True,  he=False, balanced=True)
-
-# img = plt.imread(f'images/ground_truth/bird.png')
-# img_n = cv2.normalize(src=img, dst=None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-
-# gt= clahe_custom(img_n)
-# #gt=cv2.normalize(gt, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-# plt.imshow(gt)
-# plt.title('Mosaic Image')
-# plt.show()
+demosaic(name,1,RK,GK,smoothing=False, is_gt=True,  he=False, balanced=False, pattern='RGGB')

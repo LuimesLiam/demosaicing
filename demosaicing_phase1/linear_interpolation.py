@@ -63,7 +63,7 @@ def mean_squared_error(imageA, imageB):
     return err
 
 name = ['bird.png', 'truck.png']
-ind = 0
+ind = 1
 mosaic_images_dir = f'images/mosaiced/{name[ind]}'
 ground_truth_images_dir = f'images/ground_truth/{name[ind]}'
 
