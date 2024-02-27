@@ -208,5 +208,6 @@ GK = np.load(f"outputs/matrix/{patternA[0]}.npy")
 print("G", GK)
 print("R", RK)
 name = ['bird.png', 'truck.png','snow-dog.png','bird-white.png']
+#gbrg
 
-demosaic(name,1,RK,GK,smoothing=False, is_gt=True,  he=False, balanced=False, pattern='RGGB')
+demosaic(name,0,RK,GK,smoothing=True, is_gt=False,  he=True, balanced=False, pattern='RGGB')

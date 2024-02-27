@@ -156,8 +156,9 @@ def mean_squared_error(imageA, imageB):
 
 
 print("start")
-names = ['bird.png', 'truck.png','snow-dog.png']
+names = ['bird.png', 'truck.png','snow-dog.png','bird-white.png']
 ind = 1
+
 CFA = plt.imread(f'images/mosaiced/{names[ind]}')
 gt = plt.imread(f'images/ground_truth/{names[ind]}')
 eg=demosaic_CFA_Bayer(CFA, 'RGGB')
