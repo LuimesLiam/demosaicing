@@ -82,6 +82,8 @@ def clahe2(image, clip_limit=2.0, grid_size=(8, 8)):
     clahe_image = cv2.cvtColor(clahe_lab_image, cv2.COLOR_LAB2BGR)
     
     return clahe_image
+
+
 def gray_world_white_balance(image):
     # Convert the image to float32 to avoid overflow during calculations
     img_float = image.astype(np.float32)
@@ -153,7 +155,7 @@ def mean_squared_error(imageA, imageB):
 
 
 def demosaic(names, ind, RK, GK, smoothing= False, norm=False, display=True, is_gt=False, balanced=False, he=False, pattern ='RGGB' ):
-    CFA = plt.imread(f'images/mosaiced/{names[ind]}')
+    CFA = plt.imread(f'images/mosaiced_noise/{names[ind]}')
     if is_gt == True:
         gt = plt.imread(f'images/ground_truth/{names[ind]}')
 
@@ -207,7 +209,8 @@ GK = np.load(f"outputs/matrix/{patternA[0]}.npy")
 
 print("G", GK)
 print("R", RK)
-name = ['bird.png', 'truck.png','snow-dog.png','bird-white.png']
+name = ['bird.png', 'truck.png','snow-dog.png','bird-white.png','kodim05.png']
 #gbrg
+demosaic(name,1,RK,GK,smoothing=True, is_gt=False,  he=False, balanced=False, pattern='RGGB')
 
-demosaic(name,0,RK,GK,smoothing=True, is_gt=False,  he=True, balanced=False, pattern='RGGB')
+

@@ -159,7 +159,7 @@ print("start")
 names = ['bird.png', 'truck.png','snow-dog.png','bird-white.png']
 ind = 1
 
-CFA = plt.imread(f'images/mosaiced/{names[ind]}')
+CFA = plt.imread(f'images/mosaiced_noise/{names[ind]}')
 gt = plt.imread(f'images/ground_truth/{names[ind]}')
 eg=demosaic_CFA_Bayer(CFA, 'RGGB')
 #eg= cv2.normalize(eg, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)

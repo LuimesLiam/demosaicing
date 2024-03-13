@@ -6,7 +6,6 @@ import cv2
 import skimage.exposure
 from typing import Tuple
 from scipy.signal import convolve2d
-from sklearn.metrics import mean_squared_error
 
 def bayer(im):
     r = np.zeros(im.shape[:2])
