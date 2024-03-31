@@ -1,7 +1,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.ndimage import convolve, convolve1d  # Updated import
+from scipy.ndimage import convolve, convolve1d  
 from sklearn.linear_model import LinearRegression
 from PIL import Image
 import cv2
@@ -44,7 +44,6 @@ def create_bayer_masks(shape, pattern):
         G_m[1::2, 1::2] = 1
     else:
         raise ValueError("Unsupported Bayer pattern")
-    # Add similar conditions for other patterns ("BGGR", "GRBG", "GBRG")
     return R_m, G_m, B_m
 
 def horizontal_convolution(image, filter_kernel):
@@ -150,10 +149,6 @@ def mean_squared_error(imageA, imageB):
     err /= float(imageA.shape[0] * imageA.shape[1])
 
     return err
-
-# Usage Example:
-# Assuming img1 and img2 are your two images loaded as numpy arrays (e.g., using matplotlib's imread function)
-
 
 print("start")
 names = ['bird.png', 'truck.png','snow-dog.png','bird-white.png']

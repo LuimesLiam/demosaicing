@@ -139,7 +139,6 @@ def create_bayer_masks(shape, pattern):
         G_m[1::2, 1::2] = 1
     else:
         raise ValueError("Unsupported Bayer pattern")
-    # Add similar conditions for other patterns ("BGGR", "GRBG", "GBRG")
     return R_m, G_m, B_m
 
 def mean_squared_error(imageA, imageB):
@@ -201,11 +200,11 @@ def demosaic(names, ind, RK, GK, smoothing= False, norm=False, display=True, is_
         plt.show()
         
 
-patternB = ['Bbest-rggb','dirtyred']
+patternB = ['Bbest-rggb','dirtyred', ]
 patternA = ['Abest-rggb', 'dirtygreen']
-RK = np.load(f"outputs/matrix/{patternB[0]}.npy")
+RK = np.load(f"outputs/matrix/{patternB[1]}.npy")
 
-GK = np.load(f"outputs/matrix/{patternA[0]}.npy")
+GK = np.load(f"outputs/matrix/{patternA[1]}.npy")
 
 print("G", GK)
 print("R", RK)

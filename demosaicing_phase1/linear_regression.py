@@ -13,16 +13,7 @@ import time
 save_work = False
 print_status = False
 input_str = []
-# def masks_CFA_Bayer(shape: int or Tuple[int, ...], pattern: str = "RGGB") -> Tuple[np.ndarray, ...]:
 
-
-#     pattern = pattern.upper()
-#     channels = {channel: np.zeros(shape, dtype="bool") for channel in "RGB"}
-    
-#     for channel, (y, x) in zip(pattern, [(0, 0), (0, 1), (1, 0), (1, 1)]):
-#         channels[channel][y::2, x::2] = 1
-
-#     return tuple(channels.values())
 
 def masks_CFA_Bayer(shape: int or Tuple[int, ...], pattern: str = "RGGB") -> Tuple[np.ndarray, ...]:
     R_m = np.zeros(shape)
@@ -51,7 +42,6 @@ def masks_CFA_Bayer(shape: int or Tuple[int, ...], pattern: str = "RGGB") -> Tup
         G_m[1::2, 1::2] = 1
     else:
         raise ValueError("Unsupported Bayer pattern")
-    # Add similar conditions for other patterns ("BGGR", "GRBG", "GBRG")
     return R_m, G_m, B_m
 
 def learn(input_images, kernels, ground_truths=None, gamma=0.05, name=None):
@@ -126,7 +116,7 @@ def learn(input_images, kernels, ground_truths=None, gamma=0.05, name=None):
 
         nkernel = kernel.detach().numpy()   
         print(name[k], nkernel)
-        np.save(f'outputs/matrix/{name[k]}', nkernel)
+        np.save(f'outputs/matrix/{name[k]}_noise', nkernel)
     
 def input_thread():
     global save_work
@@ -150,7 +140,7 @@ def input_thread():
 print("start")
 names = ['bird.png', 'truck.png','snow-dog.png']
 ind = 1
-CFA = plt.imread(f'images/mosaiced/{names[ind]}')
+CFA = plt.imread(f'images/mosaiced_noise/{names[ind]}')
 gt = plt.imread(f'images/ground_truth/{names[ind]}')
 
 R_m, G_m, B_m = masks_CFA_Bayer(CFA.shape, "RGGB")
