@@ -1,16 +1,6 @@
 import numpy as np
 
 def apply_median_filter(image, kernel_size=3):
-    """
-    Apply a median filter to the image manually.
-    
-    Parameters:
-        image (numpy.ndarray): The input image as a NumPy array.
-        kernel_size (int): The size of the kernel. Must be an odd number.
-    
-    Returns:
-        numpy.ndarray: The denoised image.
-    """
     # Ensure kernel_size is odd to have a center pixel
     if kernel_size % 2 == 0:
         raise ValueError("Kernel size must be odd.")
@@ -33,13 +23,3 @@ def apply_median_filter(image, kernel_size=3):
                 denoised_image[i, j, channel] = np.median(kernel)
     
     return denoised_image
-
-# Example usage:
-if __name__ == "__main__":
-    # Assuming `noised_image` is your input NumPy array
-    # noised_image = np.random.randint(0, 255, (640, 480, 3), dtype=np.uint8)
-    # denoised_image = apply_median_filter(noised_image, kernel_size=3)
-    
-    # You would load your image here and convert it to a NumPy array.
-    # Remember to adjust `kernel_size` based on your needs.
-    pass

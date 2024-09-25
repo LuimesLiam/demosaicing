@@ -1,5 +1,7 @@
 from PIL import Image
 import os
+import shutil
+
 
 def convert_to_png(input_dir, output_dir):
     # Create output directory if it doesn't exist
@@ -32,8 +34,6 @@ def convert_to_png(input_dir, output_dir):
 
 # convert_to_png(input_directory, output_directory)
 
-import os
-import shutil
 
 def copy_images(source_dir, dest_dir, num_images):
     # Create destination directory if it doesn't exist

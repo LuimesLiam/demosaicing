@@ -5,27 +5,14 @@ import cv2
 from scipy.ndimage import gaussian_filter, sobel
 
 def apply_anti_aliasing_filter(image, sigma=1.5):
-    """
-    Apply a Gaussian filter for anti-aliasing. The sigma controls the strength
-    of smoothing. A larger sigma value will result in more smoothing, which can
-    help in reducing aliasing but may also blur the image.
-    """
     return gaussian_filter(image, sigma=sigma)
 
 def edge_aware_smoothing(image):
-    """
-    An example function that demonstrates edge-aware smoothing. This function
-    uses the Sobel operator to detect edges and applies a mild Gaussian
-    smoothing. The smoothing is less aggressive near edges to preserve detail.
-    """
     edge_magnitude = np.sqrt(sobel(image, axis=0)**2 + sobel(image, axis=1)**2)
     edge_magnitude = edge_magnitude / edge_magnitude.max()  # Normalize
     
     # Smooth the image
     smoothed_image = gaussian_filter(image, sigma=1)
-    
-    # Blend the original and smoothed images based on edge magnitude
-    # This is a simplified approach; more sophisticated methods could be used
     k = 0.5  # Blend factor; could be adapted based on edge strength
     final_image = k * image + (1 - k) * smoothed_image * (1 - edge_magnitude)
     
